@@ -17,15 +17,15 @@
     <button class="btn" onclick="sendOpenCommand()">ОТКРЫТЬ ДВЕРЬ</button>
 
     <script>
-        // Точный хэш от пароля "Evgen_09"
+        
         const securePasswordHash = "5d4cf15281812f2216d79e5f21adf2ae0b372f59a6f2ab5e5a771446630408a2"; 
 
-        // ИСПРАВЛЕНО: Эталонная функция хэширования, которая работает без ошибок
+        
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);                    
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
-            // Метод форматирования байт в строку HEX без потери символов
+            
             const hashHex = hashArray.map(b => ('0' + b.toString(16)).slice(-2)).join('');
             return hashHex;
         }
@@ -48,15 +48,15 @@
 
             alert("⏳ Пароль верен! Отправка команды на домофон...");
 
-            // ⚠️ ВПИШИТЕ СЮДА IP-АДРЕС ВАШЕЙ ESP32 ИЗ МОНИТОРА ПОРТА ARDUINO IDE!
+            
             const espIp = "192.168.1.50"; 
 
             fetch(`http://${espIp}/open`)
                 .then(response => {
-                    alert("✅ Дверь успешно открывается!");
+                    alert("Дверь успешно открывается!");
                 })
                 .catch(error => {
-                    alert("⚠️ Пароль верен, но нет связи с платой ESP32. Убедитесь, что телефон подключен к тому же Wi-Fi.");
+                    alert("Пароль верен, но нет связи с платой ESP32. Убедитесь, что телефон подключен к тому же Wi-Fi.");
                 });
         }
     </script>
