@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Домофон</title>
-     
-    <!-- ИСПРАВЛЕНО: Возвращаем правильную библиотеку MQTT, без неё кнопка не нажмется -->
     <script src="https://cloudflare.com"></script>
-    
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background-color: #f4f6f9; color: #333; margin-top: 80px; }
         h1 { font-size: 28px; margin-bottom: 30px; }
         .btn { background-color: #00ea7f; border: none; color: #111; padding: 25px 50px; font-size: 22px; font-weight: bold; cursor: pointer; border-radius: 50px; box-shadow: 0 10px 20px rgba(0,234,127,0.3); transition: 0.3s; }
         .btn:active { transform: translateY(3px); box-shadow: 0 4px 10px rgba(0,234,127,0.2); background-color: #00c76c; }
     </style>
-</head> <!-- ИСПРАВЛЕНО: Убрана опечатка с vvvhead -->
+</head>
 <body>
 
     <h1>Управление Домофоном</h1>
@@ -31,33 +28,38 @@
                 return;
             }
 
-            // Подключаемся к брокеру
+            let isConnected = false;
+
             const client = mqtt.connect(mqttHost, { 
                 username: 'domofon', 
                 password: userPassword,
-                connectTimeout: 4000 // Ждем ответа от сервера 4 секунды
+                connectTimeout: 3000, // (3 секунды)
+                reconnectPeriod: 0    // Запрещаем повторные автоматические попытки
             });
 
-            // Если пароль не подошел или произошла ошибка
-            client.on('error', function(err) {
-                alert('Неверный пароль или ошибка подключения!');
-                client.end();
-            });
-
-            // Если за 5 секунд не смогли подключиться (например, сервер недоступен)
-            setTimeout(() => {
-                if (!client.connected) {
-                    alert(' Ошибка авторизации или нет связи с сервером. Проверьте пароль.');
-                    client.end();
-                }
-            }, 5000);
-
-            // Если всё успешно
+            // 1. Успешный вход
             client.on('connect', function () {
+                isConnected = true;
                 client.publish('home/domofon/open', '1', { qos: 1 }, function() {
-                    alert('Пароль верен! Дверь открывается!');
+                    alert('✅ Пароль верен! Дверь открывается!');
                     client.end(); 
                 });
+            });
+
+           
+            client.on('close', function() {
+                if (!isConnected) {
+                    alert('Ошибка: Неверный пароль или доступ отклонен!');
+                    client.end();
+                }
+            });
+
+            // 3. Общая ошибка сети
+            client.on('error', function(err) {
+                if (!isConnected) {
+                    alert('Ошибка авторизации!');
+                    client.end();
+                }
             });
         }
     </script>
