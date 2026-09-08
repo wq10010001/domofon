@@ -19,10 +19,15 @@
     <script>
         
         const secretPin = '5efd15e98eb71d53347f9e8a719d453dae00cecc6fbeffca835848cb36db1696'; 
-
+        CryptoJS.SHA256(userPassword).toString();
         function sendOpenCommand() {
             const userPassword = prompt("Введите секретный PIN-код от домофона:");
-            
+            const inputHash = CryptoJS.SHA256(userPassword).toString();
+
+            if (inputHash !== securePasswordHash) {
+                alert("❌ Ошибка: Неверный пароль! Доступ отклонен.");
+                return; // Код дальше не пойдет, запрос на плату не отправится!
+            }
             if (!userPassword) {
                 alert("Пароль не введен!");
                 return;
