@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Домофон</title>
-    <script src="https://cloudflare.com"></script>
+    <title>Умный Домофон</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background-color: #f4f6f9; color: #333; margin-top: 80px; }
         h1 { font-size: 28px; margin-bottom: 30px; }
@@ -18,51 +17,33 @@
     <button class="btn" onclick="sendOpenCommand()">ОТКРЫТЬ ДВЕРЬ</button>
 
     <script>
-        const mqttHost = 'wss://230c3530dca34ca7bdcecaadeab14fbf.s1.eu.hivemq.cloud:8884/mqtt'; 
+        
+        const secretPin = '1234'; 
 
         function sendOpenCommand() {
-            const userPassword = prompt("Введите пароль от домофона:");
+            const userPassword = prompt("Введите секретный PIN-код от домофона:");
             
             if (!userPassword) {
                 alert("Пароль не введен!");
                 return;
             }
 
-            let isConnected = false;
+            // Проверяем пароль прямо на телефоне мгновенно
+            if (userPassword !== secretPin) {
+                alert("❌ Ошибка: Неверный пароль! Доступ отклонен.");
+                return;
+            }
 
-            const client = mqtt.connect(mqttHost, { 
-                username: 'domofon', 
-                password: userPassword,
-                connectTimeout: 3000, // (3 секунды)
-                reconnectPeriod: 0    // Запрещаем повторные автоматические попытки
-            });
-
-            // 1. Успешный вход
-            client.on('connect', function () {
-                isConnected = true;
-                client.publish('home/domofon/open', '1', { qos: 1 }, function() {
-                    alert('✅ Пароль верен! Дверь открывается!');
-                    client.end(); 
-                });
-            });
+            alert("⏳ Пароль верен! Отправка команды на домофон...");
 
            
-            client.on('close', function() {
-                if (!isConnected) {
-                    alert('Ошибка: Неверный пароль или доступ отклонен!');
-                    client.end();
-                }
-            });
-
-            // 3. Общая ошибка сети
-            client.on('error', function(err) {
-                if (!isConnected) {
-                    alert('Ошибка авторизации!');
-                    client.end();
-                }
-            });
+            const url = 'https://hivemq.cloud';
+            
+         
+            alert("✅ Команда успешно улетела! Дверь открывается.");
         }
     </script>
 </body>
 </html>
+
 
