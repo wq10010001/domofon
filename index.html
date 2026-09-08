@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Домофон</title>
+    <title>Умный Домофон</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background-color: #f4f6f9; color: #333; margin-top: 80px; }
         h1 { font-size: 28px; margin-bottom: 30px; }
@@ -17,38 +17,51 @@
     <button class="btn" onclick="sendOpenCommand()">ОТКРЫТЬ ДВЕРЬ</button>
 
     <script>
-        
-        const secretPin = '5efd15e98eb71d53347f9e8a719d453dae00cecc6fbeffca835848cb36db1696'; 
-        CryptoJS.SHA256(userPassword).toString();
-        function sendOpenCommand() {
-            const userPassword = prompt("Введите секретный PIN-код от домофона:");
-            const inputHash = CryptoJS.SHA256(userPassword).toString();
+        // Точный хэш от пароля "Evgen_09"
+        const securePasswordHash = "5efd15e98eb71d53347f9e8a719d453dae00cecc6fbeffca835848cb36db1696"; 
 
-            if (inputHash !== securePasswordHash) {
-                alert("❌ Ошибка: Неверный пароль! Доступ отклонен.");
-                return; // Код дальше не пойдет, запрос на плату не отправится!
-            }
+        // ИСПРАВЛЕНО: Эталонная функция хэширования, которая работает без ошибок
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);                    
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            // Метод форматирования байт в строку HEX без потери символов
+            const hashHex = hashArray.map(b => ('0' + b.toString(16)).slice(-2)).join('');
+            return hashHex;
+        }
+
+        async function sendOpenCommand() {
+            const userPassword = prompt("Введите секретный пароль от домофона:");
+            
             if (!userPassword) {
                 alert("Пароль не введен!");
                 return;
             }
 
-            // Проверяем пароль прямо на телефоне мгновенно
-            if (userPassword !== secretPin) {
-                alert("Ошибка: Неверный пароль! Доступ отклонен.");
-                return;
+            const inputHash = await sha256(userPassword);
+
+            // Проверяем совпадение хэшей
+            if (inputHash !== securePasswordHash) {
+                alert("❌ Ошибка: Неверный пароль! Доступ отклонен.");
+                return; 
             }
 
-            alert("Пароль верен! Отправка команды на домофон...");
+            alert("⏳ Пароль верен! Отправка команды на домофон...");
 
-           
-            const url = 'https://hivemq.cloud';
-            
-         
-            alert("Команда успешно улетела! Дверь открывается.");
+            // ⚠️ ВПИШИТЕ СЮДА IP-АДРЕС ВАШЕЙ ESP32 ИЗ МОНИТОРА ПОРТА ARDUINO IDE!
+            const espIp = "192.168.1.50"; 
+
+            fetch(`http://${espIp}/open`)
+                .then(response => {
+                    alert("✅ Дверь успешно открывается!");
+                })
+                .catch(error => {
+                    alert("⚠️ Пароль верен, но нет связи с платой ESP32. Убедитесь, что телефон подключен к тому же Wi-Fi.");
+                });
         }
     </script>
 </body>
 </html>
+
 
 
