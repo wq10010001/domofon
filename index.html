@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Умный Домофон</title>
+    <title>Домофон</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background-color: #f4f6f9; color: #333; margin-top: 80px; }
         h1 { font-size: 28px; margin-bottom: 30px; }
@@ -18,7 +18,7 @@
 
     <script>
         
-        const secretPin = '1234'; 
+        const secretPin = '5efd15e98eb71d53347f9e8a719d453dae00cecc6fbeffca835848cb36db1696'; 
 
         function sendOpenCommand() {
             const userPassword = prompt("Введите секретный PIN-код от домофона:");
@@ -30,17 +30,17 @@
 
             // Проверяем пароль прямо на телефоне мгновенно
             if (userPassword !== secretPin) {
-                alert("❌ Ошибка: Неверный пароль! Доступ отклонен.");
+                alert("Ошибка: Неверный пароль! Доступ отклонен.");
                 return;
             }
 
-            alert("⏳ Пароль верен! Отправка команды на домофон...");
+            alert("Пароль верен! Отправка команды на домофон...");
 
            
             const url = 'https://hivemq.cloud';
             
          
-            alert("✅ Команда успешно улетела! Дверь открывается.");
+            alert("Команда успешно улетела! Дверь открывается.");
         }
     </script>
 </body>
